@@ -1,41 +1,35 @@
-function sendMessage() {
-  fetch("http://127.0.0.1:8000/api/contact/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      name: name.value,
-      email: email.value,
-      message: message.value
-    })
-  })
-  .then(res => res.json())
-  .then(() => {
-    document.getElementById("status").innerText = "Message sent successfully!";
+/* =========================
+   CONTACT FORM (FRONTEND ONLY)
+========================= */
+function sendMessage(event) {
+  event.preventDefault(); // stop page reload
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const message = document.getElementById("message").value.trim();
+  const status = document.getElementById("status");
+
+  if (name === "" || email === "" || message === "") {
+    status.innerText = "❌ Please fill all fields";
+    status.style.color = "red";
+    return;
+  }
+
+  // Frontend success message (NO backend)
+  status.innerText = "✅ Message sent successfully!";
+  status.style.color = "#38bdf8";
+
+  // Clear form
+  document.getElementById("contactForm").reset();
+}
+
+/* =========================
+   SMOOTH PROJECT SCROLL
+========================= */
+function goToProjects() {
+  document.getElementById("projects").scrollIntoView({
+    behavior: "smooth"
   });
-}
-
-function goToProjects() {
-    document.getElementById("projects").scrollIntoView({
-        behavior: "smooth"
-    });
-}
-
-
-/* =========================
-   PROJECT SCROLL
-========================= */
-function goToProjects() {
-  document.getElementById("projects").scrollIntoView({ behavior: "smooth" });
-}
-
-/* =========================
-   CONTACT MESSAGE DEMO
-========================= */
-function sendMessage() {
-  document.getElementById("status").innerText =
-    "✅ Message sent successfully!";
 }
 
 /* =========================
@@ -44,45 +38,49 @@ function sendMessage() {
 const reveals = document.querySelectorAll(".reveal");
 
 window.addEventListener("scroll", () => {
-  reveals.forEach((el) => {
+  reveals.forEach(el => {
     const top = el.getBoundingClientRect().top;
-    const screen = window.innerHeight;
+    const screenHeight = window.innerHeight;
 
-    if (top < screen - 100) {
+    if (top < screenHeight - 100) {
       el.classList.add("active");
     }
   });
 });
 
-
 /* =========================
-   TYPING EFFECT
+   TYPING TEXT EFFECT
 ========================= */
-const words = ["Full Stack Developer", "Python Developer", "React Developer"];
-let i = 0;
-let j = 0;
-let currentWord = "";
+const words = [
+  "Full Stack Developer",
+  "Python Developer",
+  "Web Developer"
+];
+
+let wordIndex = 0;
+let charIndex = 0;
 let isDeleting = false;
 
-function type() {
-  if (i < words.length) {
-    if (!isDeleting && j <= words[i].length) {
-      currentWord = words[i].slice(0, j++);
-    } else if (isDeleting && j >= 0) {
-      currentWord = words[i].slice(0, j--);
-    }
+function typingEffect() {
+  const typingElement = document.getElementById("typing");
+  const currentWord = words[wordIndex];
 
-    document.getElementById("typing").innerText = currentWord;
-
-    if (j === words[i].length) isDeleting = true;
-    if (isDeleting && j === 0) {
-      isDeleting = false;
-      i++;
+  if (!isDeleting) {
+    typingElement.innerText = currentWord.slice(0, charIndex++);
+    if (charIndex > currentWord.length) {
+      isDeleting = true;
+      setTimeout(typingEffect, 1000);
+      return;
     }
   } else {
-    i = 0;
+    typingElement.innerText = currentWord.slice(0, charIndex--);
+    if (charIndex === 0) {
+      isDeleting = false;
+      wordIndex = (wordIndex + 1) % words.length;
+    }
   }
-  setTimeout(type, 120);
+
+  setTimeout(typingEffect, isDeleting ? 80 : 120);
 }
 
-type();
+typingEffect();
